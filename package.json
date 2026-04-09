@@ -5,6 +5,7 @@
     "version": "0.1.0",
     "publisher": "zhongli-studio",
     "license": "MIT",
+    "icon": "media/zhongli-icon.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/westsmiles2405/zhongli-skill.git"
@@ -76,14 +77,14 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "zhongli-sidebar",
+                    "id": "zhongli-companion",
                     "title": "钟离的书斋",
                     "icon": "media/zhongli-icon.svg"
                 }
             ]
         },
         "views": {
-            "zhongli-sidebar": [
+            "zhongli-companion": [
                 {
                     "type": "webview",
                     "id": "zhongli.chatPanel",
