@@ -1,5 +1,5 @@
 /**
- * 钟离番茄钟 — PomodoroTimer
+ * 番茄钟计时器 — 钟离风格
  */
 
 import * as vscode from 'vscode';
@@ -7,68 +7,70 @@ import * as vscode from 'vscode';
 export type PomodoroPhase = 'focus-end' | 'break-start' | 'break-end';
 
 export class PomodoroTimer {
-    private timer: ReturnType<typeof setInterval> | undefined;
+    private timer?: ReturnType<typeof setInterval>;
+    private remaining = 0;
     private statusBarItem: vscode.StatusBarItem;
-    private _isRunning = false;
-    private _completedCount = 0;
+    private isBreak = false;
+    private completed = 0;
 
     constructor() {
-        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+        this.statusBarItem = vscode.window.createStatusBarItem(
+            vscode.StatusBarAlignment.Right,
+            100,
+        );
     }
 
-    get isRunning(): boolean {
-        return this._isRunning;
-    }
-
-    get completedCount(): number {
-        return this._completedCount;
-    }
-
-    start(minutes: number, onPhase: (phase: PomodoroPhase) => void): void {
-        if (this._isRunning) { return; }
+    public start(
+        minutes: number,
+        onPhase: (phase: PomodoroPhase) => void,
+    ): void {
         this.stop();
-        this._isRunning = true;
+        this.remaining = minutes * 60;
+        this.isBreak = false;
 
-        let remaining = minutes * 60;
-        this.statusBarItem.text = `🪨 专注 ${this.formatTime(remaining)}`;
-        this.statusBarItem.show();
+        const config = vscode.workspace.getConfiguration('zhongli');
+        const showStatus = config.get<boolean>('enableStatusBar', true);
+
+        if (showStatus) {
+            this.statusBarItem.show();
+        }
 
         this.timer = setInterval(() => {
-            remaining--;
-            this.statusBarItem.text = `🪨 专注 ${this.formatTime(remaining)}`;
+            this.remaining--;
+            const display = this.formatTime(this.remaining);
+            const prefix = this.isBreak ? '🍵 休息' : '🪨 专注';
+            this.statusBarItem.text = `${prefix} ${display}`;
 
-            if (remaining <= 0) {
-                this.clearTimer();
-                this._completedCount++;
+            if (this.remaining <= 0) {
+                if (this.isBreak) {
+                    this.stop();
+                    onPhase('break-end');
+                    return;
+                }
+                this.completed++;
                 onPhase('focus-end');
-
-                const breakMin = vscode.workspace.getConfiguration('zhongli').get<number>('breakMinutes', 5);
-                let breakRemaining = breakMin * 60;
-                this.statusBarItem.text = `🍵 休息 ${this.formatTime(breakRemaining)}`;
+                const breakMins = config.get<number>('breakMinutes', 5);
+                this.remaining = breakMins * 60;
+                this.isBreak = true;
                 onPhase('break-start');
-
-                this.timer = setInterval(() => {
-                    breakRemaining--;
-                    this.statusBarItem.text = `🍵 休息 ${this.formatTime(breakRemaining)}`;
-
-                    if (breakRemaining <= 0) {
-                        this.stop();
-                        onPhase('break-end');
-                    }
-                }, 1000);
             }
         }, 1000);
     }
 
-    stop(): void {
-        this.clearTimer();
-        this._isRunning = false;
+    public stop(): void {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = undefined;
+        }
         this.statusBarItem.hide();
     }
 
-    dispose(): void {
-        this.stop();
-        this.statusBarItem.dispose();
+    public get isRunning(): boolean {
+        return this.timer !== undefined;
+    }
+
+    public get completedCount(): number {
+        return this.completed;
     }
 
     private formatTime(seconds: number): string {
@@ -77,10 +79,8 @@ export class PomodoroTimer {
         return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
-    private clearTimer(): void {
-        if (this.timer) {
-            clearInterval(this.timer);
-            this.timer = undefined;
-        }
+    public dispose(): void {
+        this.stop();
+        this.statusBarItem.dispose();
     }
 }
