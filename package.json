@@ -1,0 +1,130 @@
+{
+    "name": "zhongli-companion",
+    "displayName": "钟离工作陪伴",
+    "description": "让岩王帝君钟离以沉稳契约精神陪伴你的 VS Code 工作之旅",
+    "version": "0.1.0",
+    "publisher": "zhongli-studio",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/westsmiles2405/zhongli-skill.git"
+    },
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./out/extension.js",
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "lint": "eslint src --ext ts"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "zhongli.openStage",
+                "title": "钟离：今日契约",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.startPomodoro",
+                "title": "钟离：开始番茄钟专注",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.stopPomodoro",
+                "title": "钟离：结束番茄钟",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.encourageMe",
+                "title": "钟离：给我打气",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.reviewWork",
+                "title": "钟离：契约审判代码",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.finale",
+                "title": "钟离：今日收工",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.lore",
+                "title": "钟离：讲个璃月典故",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.tea",
+                "title": "钟离：沏一壶好茶",
+                "category": "Zhongli"
+            },
+            {
+                "command": "zhongli.hutao",
+                "title": "钟离：聊聊胡桃",
+                "category": "Zhongli"
+            }
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "zhongli-sidebar",
+                    "title": "钟离的书斋",
+                    "icon": "media/zhongli-icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "zhongli-sidebar": [
+                {
+                    "type": "webview",
+                    "id": "zhongli.chatPanel",
+                    "name": "钟离的书斋"
+                }
+            ]
+        },
+        "configuration": {
+            "title": "钟离工作陪伴",
+            "properties": {
+                "zhongli.pomodoroMinutes": {
+                    "type": "number",
+                    "default": 25,
+                    "description": "番茄钟专注时长（分钟）"
+                },
+                "zhongli.breakMinutes": {
+                    "type": "number",
+                    "default": 5,
+                    "description": "休息时长（分钟）"
+                },
+                "zhongli.enableIdleReminder": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "是否在长时间未操作时提醒"
+                },
+                "zhongli.idleMinutes": {
+                    "type": "number",
+                    "default": 30,
+                    "description": "闲置多少分钟后提醒"
+                },
+                "zhongli.enableStatusBar": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "是否在状态栏显示钟离"
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "@types/node": "^20.10.0",
+        "@types/vscode": "^1.85.0",
+        "typescript": "^5.3.3"
+    }
+}
